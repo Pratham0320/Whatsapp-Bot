@@ -1,52 +1,39 @@
-import { type NextRequest, NextResponse } from "next/server"
+import { NextRequest, NextResponse } from "next/server";
 
-interface OnboardingData {
-  whatsappNumber: string
-  businessName: string
-  category: string
-  messagePreferences: string
-}
+type OnboardingData = {
+  whatsappNumber: string;
+  businessName: string;
+  category: string;
+  messagePreferences: string;
+};
 
 export async function POST(request: NextRequest) {
   try {
-    const data: OnboardingData = await request.json()
+    const data: OnboardingData = await request.json();
 
-    // Log the payload for now (in production, this would save to database)
-    console.log("Onboarding data received:", {
-      whatsappNumber: data.whatsappNumber,
-      businessName: data.businessName,
-      category: data.category,
-      messagePreferences: data.messagePreferences,
-      timestamp: new Date().toISOString(),
-    })
+    console.log("Received onboarding data:", data);
 
-    // Validate required fields
-    if (!data.whatsappNumber || !data.businessName || !data.category || !data.messagePreferences) {
-      return NextResponse.json({ error: "Missing required fields" }, { status: 400 })
+    // Step 1: Trigger your n8n webhook
+    console.log("Calling n8n with:", data)
+    const webhookResponse = await fetch(
+      "https://maverick0320.app.n8n.cloud/webhook-test/auto-bot-setup",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      }
+    );
+
+    if (!webhookResponse.ok) {
+      console.error("n8n call failed:", await webhookResponse.text());
     }
 
-    // In a real implementation, you would:
-    // 1. Save to database (Firestore, MongoDB, etc.)
-    // 2. Trigger n8n workflow creation
-    // 3. Set up WhatsApp Business API integration
-    // 4. Send welcome email to customer
-
-    // Simulate processing time
-    await new Promise((resolve) => setTimeout(resolve, 1000))
-
+    return NextResponse.json({ success: true });
+  } catch (err) {
+    console.error("Error:", err);
     return NextResponse.json(
-      {
-        success: true,
-        message: "Onboarding completed successfully",
-        data: {
-          businessName: data.businessName,
-          whatsappNumber: data.whatsappNumber,
-        },
-      },
-      { status: 200 },
-    )
-  } catch (error) {
-    console.error("Error processing onboarding:", error)
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 })
+      { error: "Something went wrong" },
+      { status: 500 }
+    );
   }
 }
