@@ -105,7 +105,7 @@ export function OnboardingForm() {
             <Input
               id="whatsappNumber"
               type="tel"
-              placeholder="+91 9876543210"
+              placeholder="Enter 10-digit mobile number (without +91)"
               value={formData.whatsappNumber}
               onChange={(e) => handleInputChange("whatsappNumber", e.target.value)}
               className={errors.whatsappNumber ? "border-red-500" : ""}

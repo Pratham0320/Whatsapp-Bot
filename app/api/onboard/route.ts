@@ -16,7 +16,7 @@ export async function POST(request: NextRequest) {
     // Step 1: Trigger your n8n webhook
     console.log("Calling n8n with:", data)
     const webhookResponse = await fetch(
-      "https://maverick0320.app.n8n.cloud/webhook-test/auto-bot-setup",
+      "https://maverick0320.app.n8n.cloud/webhook/auto-bot-setup",
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
